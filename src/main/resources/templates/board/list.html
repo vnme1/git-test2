@@ -26,10 +26,9 @@
                   <td th:text="${item.bdCreateAt}"></td>
                   <td th:text="${item.bdUpdateAt}"></td>
               </tr>
-	        </th:block>    
+           </th:block>    
         </tbody>
     </table>
-    
     <th:block th:if="${detail}">   
         <h1 style="padding: 30px 0;" th:text="${detail.bdTitle}"></h1>
         <div style="text-align: right;">
@@ -47,10 +46,11 @@
         </div>
 
         <div style="padding: 30px 0; text-align:right;">
-		        <a th:href="@{/edit(bdSeq = ${detail.bdSeq})}"><button>수정</button></a>
+        <th:block th:if ="${detail.mbId == session.id}">
+          <a th:href="@{/edit(bdSeq = ${detail.bdSeq})}"><button>수정</button></a>
             <a th:href="@{/remove(bdSeq = ${detail.bdSeq})}"><button>삭제</button></a>
             <a th:href="@{bdList}"><button style="background-color: #00a2be; color: white; margin-left: 20px">목록으로</button></a>
+        </th:block>
         </div>
-        
     </th:block>
 </div>
