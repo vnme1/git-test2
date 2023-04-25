@@ -20,11 +20,11 @@ public class Pagination {
 		System.out.println("pnum"+pnum);
 		if (pnum == null) { pnum = "1"; }
 		
-		
+		//String -> integer
 		int rowNUM = Integer.parseInt(pnum);
 		if(rowNUM < 0) {rowNUM = 1;}
 		
-		
+		//페이지네이션 범위 정하기 나머지o +1
 		int pageNum;
 		if (totalcount % 10 == 0) { 
 			pageNum = totalcount / 10; 
@@ -32,7 +32,7 @@ public class Pagination {
 			pageNum = (totalcount / 10) + 1; 
 		}
 		if(rowNUM > pageNum) { rowNUM = pageNum; }
-		
+		// 페이지네이션 중간범위 지정-- 시작페이지 21번~27번 -- 끝페이지30
 		int temp = (rowNUM - 1) % 10; 
 		int startpage = rowNUM - temp; 
 		int endpage = startpage + (10-1);

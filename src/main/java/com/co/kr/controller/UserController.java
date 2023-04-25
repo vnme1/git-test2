@@ -97,15 +97,21 @@ public class UserController {
 	public ModelAndView mbList(HttpServletRequest request) {
 		ModelAndView mav = new ModelAndView();
 		HttpSession session = request.getSession();
+		
+		//session저장 page가져오기
 		String page = (String) session.getAttribute("page"); // session에 담고 있는 page 꺼냄
-		if(page == null)page = "1"; // 없으면 1로
+		//request param저장 page가져오기
+		String paramPage = request.getParameter("page");
 		
-		//클릭페이지 세션에 담아줌
-		session.setAttribute("page", page);
-		
+		if(paramPage != null) { // param 있
+			session.setAttribute("page", paramPage);
+		}else if(page != null) { //session 있
+			session.setAttribute("page", page);
+		}else {
+			session.setAttribute("page", "1");
+		}
 		//페이지네이션
 		mav = mbListCall(request);  //리스트만 가져오기
-		
 		mav.setViewName("admin/adminList.html");
 		return mav; 
 	};
@@ -113,7 +119,7 @@ public class UserController {
 	public ModelAndView mbListCall(HttpServletRequest request) { //클릭페이지 널이면 
 		ModelAndView mav = new ModelAndView();
 		//페이지네이션 쿼리 참고
-    // SELECT * FROM jsp.member order by mb_update_at limit 1, 5; {offset}{limit}
+		// SELECT * FROM jsp.member order by mb_update_at limit 1, 5; {offset}{limit}
 
 		//전체 갯수
 		int totalcount = userService.mbGetAll();
@@ -155,6 +161,7 @@ public class UserController {
 	//t수정 페이지 이동
 	@GetMapping("/modify/{mbSeq}")
     public ModelAndView mbModify(@PathVariable("mbSeq") String mbSeq, RedirectAttributes re) throws IOException {
+		//RedirectAttributes 클래스를 사용하여 데이터 전달 (addAttribute에 String 문자열을 넣어 전달)
 		ModelAndView mav = new ModelAndView();
 		re.addAttribute("mbSeq", mbSeq);
 		mav.setViewName("redirect:/mbEditList");
@@ -228,9 +235,8 @@ public class UserController {
 	
 	//adㅇmin 멤버추가, 회원가입
 	@PostMapping("create")
-	public ModelAndView create(LoginVO loginVO, HttpServletRequest request,HttpServletResponse response) throws IOException {
-		
-		ModelAndView mav = new ModelAndView();
+	public ModelAndView create(LoginVO loginVO, HttpServletRequest request,HttpServletResponse response) throws IOException {		
+		ModelAndView mav = new ModelAndView();		
 		//session 처리 
 		HttpSession session = request.getSession();
 		
@@ -241,8 +247,8 @@ public class UserController {
 		// 중복체크
 		Map<String, String> map = new HashMap();
 		map.put("mbId", loginVO.getId());
-		map.put("mbPw", loginVO.getPw());		
-		
+		map.put("mbPw", loginVO.getPw());
+				
 		// 중복체크
 		int dupleCheck = userService.mbDuplicationCheck(map);
 		System.out.println(dupleCheck);
@@ -257,30 +263,30 @@ public class UserController {
 			CommonUtils.redirect(alertText, redirectPath, response);
 		}else {			
 			//현재아이피 추출
-			String IP = CommonUtils.getClientIP(request);			
+			String IP = CommonUtils.getClientIP(request);					
 			//전체 갯수
-			int totalcount = userService.mbGetAll();			
+			int totalcount = userService.mbGetAll();
+			
 			//db insert 준비
 			LoginDomain loginDomain = LoginDomain.builder()
 					.mbId(loginVO.getId())
 					.mbPw(loginVO.getPw())
-					.mbLevel((totalcount == 0) ? "3" : "2") //level 3으로
+					.mbLevel((totalcount == 0) ? "3" : "2")  // 최초가입자를 level 3 admin 부여
 					.mbIp(IP)
 					.mbUse("Y")
 					.build();
-			//저장하기
+			// 저장
 			userService.mbCreate(loginDomain);
-			
-			if(loginVO.getAdmin() == null) { 
+			if(loginVO.getAdmin() == null) { // 'admin'들어있을때는 alert 스킵이다
 				// session 저장 
 				session.setAttribute("ip",IP);
 				session.setAttribute("id", loginDomain.getMbId());
 				session.setAttribute("mbLevel", (totalcount == 0) ? "3" : "2");   // 최초가입자를 level 3 admin 부여
 				mav.setViewName("redirect:/bdList");
-			}else { 
+			}else { // admin일때
 				mav.setViewName("redirect:/mbList?page=1");
 			}
-		}		
+		}
 		return mav;
 	};
 	
@@ -298,7 +304,7 @@ public class UserController {
 		ModelAndView mav = new ModelAndView();
 		HttpSession session = request.getSession();
 		session.invalidate(); 
-		// 전체삭제
+		// 전체삭제(invalidate 함수를 사용하여 세션을 무효화시킴)
 		mav.setViewName("index.html");
 		return mav;
 	}
