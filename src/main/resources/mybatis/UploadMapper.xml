@@ -9,6 +9,8 @@
 	  FROM jsp.board order by bd_update_at desc
 	</select>
 	
+	
+	
 	<!-- content insert -->
 	<insert id="contentUpload" parameterType="com.co.kr.domain.BoardContentDomain"
 	useGeneratedKeys="true"
@@ -88,6 +90,92 @@
 	<select id="boardSelectOneFile" resultType="com.co.kr.domain.BoardFileDomain" parameterType="map">
 	    SELECT bd_seq, mb_id, up_original_file_name, up_new_file_name, up_file_path, up_file_size
 	    FROM jsp.view_board where bd_seq = #{bdSeq}
+	</select>
+	
+	<!-- ******************************** -->
+	<!--select all 중간과제-->
+	<select id="musicList" resultType="com.co.kr.domain.MusicListDomain">
+	  SELECT bd_m_seq, mb_id, bd_m_title, bd_m_content, bd_m_create_at, bd_m_update_at
+	  FROM jsp.music order by bd_m_update_at desc
+	</select>
+	
+	<insert id="mcontentUpload" parameterType="com.co.kr.domain.MusicContentDomain"
+	useGeneratedKeys="true"
+        keyProperty="bdmSeq" keyColumn="bd_m_seq">
+	
+        INSERT INTO jsp.music (
+            mb_id,   
+			bd_m_title,                         
+			bd_m_content  
+        )
+        VALUES (
+            #{mbId},
+            #{bdmTitle},
+            #{bdmContent}
+        )
+	</insert>
+	
+	<!-- file insert -->
+	<insert id="mfileUpload" parameterType="com.co.kr.domain.MusicFileDomain">
+        INSERT INTO jsp.fmusic (
+            bd_m_seq,
+            mb_id,   
+            up_original_mfile_name,                         
+            up_new_mfile_name,                      
+            up_mfile_path,                                   
+            up_mfile_size
+        )
+        VALUES (
+            #{bdmSeq},
+            #{mbId},
+            #{upOriginalmFileName},
+            #{upNewmFileName},
+            #{upmFilePath},
+            #{upmFileSize}
+        )
+    </insert>
+
+		<!-- Content update -->
+    <update id="mbdContentUpdate" parameterType="com.co.kr.domain.MusicContentDomain">
+        UPDATE jsp.music SET
+                bd_m_seq=#{bdmSeq},
+                mb_id=#{mbId},
+                bd_m_title=#{bdmTitle},
+                bd_m_content=#{bdmContent}, 
+                bd_m_update_at=now()  
+        WHERE bd_m_seq=#{bdmSeq}
+    </update>
+
+    <!-- file update -->
+    <update id="mbdFileUpdate" parameterType="com.co.kr.domain.MusicFileDomain">
+        UPDATE jsp.fmusic SET
+                bd_m_seq=#{bdmSeq},
+                mb_id=#{mbId},
+                up_original_mfile_name=#{upOriginalmFileName},
+                up_new_mfile_name=#{upNewmFileName}, 
+                up_mfile_path=#{upmFilePath},
+                up_mfile_size=#{upmFileSize}
+        WHERE bd_m_seq=#{bdmSeq}
+    </update>
+
+	<!-- Content delete -->
+    <delete id="mbdContentRemove" parameterType="hashMap">
+       DELETE FROM jsp.music WHERE bd_m_seq=#{bdmSeq}
+    </delete>
+	<!-- file delete -->
+    <delete id="mbdFileRemove" parameterType="com.co.kr.domain.MusicFileDomain">
+	    DELETE FROM jsp.fmusic WHERE up_new_mfile_name = #{upNewmFileName}
+	</delete>
+	
+	<select id="musicSelectOne" resultType="com.co.kr.domain.MusicListDomain" parameterType="map">
+    SELECT bd_m_seq, mb_id, bd_m_title, bd_m_content, bd_m_create_at, bd_m_update_at
+    FROM jsp.music where bd_m_seq = #{bdmSeq}
+	</select>
+
+	<!-- file -->
+	<select id="musicSelectOneFile" resultType="com.co.kr.domain.MusicFileDomain" parameterType="map">
+	    SELECT bd_m_seq, mb_id, up_original_mfile_name, up_new_mfile_name, up_mfile_path, up_mfile_size
+    	FROM jsp.view_music where bd_m_seq = #{bdmSeq}
 	</select>
 
 </mapper>

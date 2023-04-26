@@ -21,6 +21,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.co.kr.domain.BoardListDomain;
 import com.co.kr.domain.LoginDomain;
+import com.co.kr.domain.MusicListDomain;
 import com.co.kr.service.UploadService;
 import com.co.kr.service.UserService;
 import com.co.kr.util.CommonUtils;
@@ -50,6 +51,7 @@ public class UserController {
 		Map<String, String> map = new HashMap();
 		map.put("mbId", loginDTO.getId());
 		map.put("mbPw", loginDTO.getPw());
+		//map.put 인자로 key와 value값을 받음 
 		
 		// 중복체크
 		int dupleCheck = userService.mbDuplicationCheck(map);
@@ -75,7 +77,8 @@ public class UserController {
 		System.out.println("items ==> "+ items);
 		mav.addObject("items", items);
 		
-		mav.setViewName("board/boardList.html"); 
+		mav.setViewName("board/boardList.html");
+		
 		
 		return mav;
 	};
@@ -89,6 +92,16 @@ public class UserController {
 		System.out.println("items ==> "+ items);
 		mav.addObject("items", items);
 		mav.setViewName("board/boardList.html");
+		return mav; 
+	}
+	
+	@RequestMapping(value = "bdmList")
+	public ModelAndView bdmList() { 
+		ModelAndView mav = new ModelAndView();
+		List<MusicListDomain> mitems = uploadService.musicList();
+		System.out.println("mitems ==> "+ mitems);
+		mav.addObject("mitems", mitems);
+		mav.setViewName("music/musicList.html");
 		return mav; 
 	}
 	
@@ -198,7 +211,8 @@ public class UserController {
 		
 		//데베업데이트
 		LoginDomain loginDomain = null; //초기화
-		String IP = CommonUtils.getClientIP(request);
+		String IP = CommonUtils.getClientIP(request);  
+		//getClientIP메서드를 사용하여 클라이언트의 아이피를 가져옴
 		loginDomain = LoginDomain.builder()
 				.mbSeq(Integer.parseInt(loginVO.getSeq()))
 				.mbId(loginVO.getId())

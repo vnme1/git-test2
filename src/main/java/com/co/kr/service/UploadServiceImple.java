@@ -26,10 +26,14 @@ import com.co.kr.code.Code;
 import com.co.kr.domain.BoardContentDomain;
 import com.co.kr.domain.BoardFileDomain;
 import com.co.kr.domain.BoardListDomain;
+import com.co.kr.domain.MusicContentDomain;
+import com.co.kr.domain.MusicFileDomain;
+import com.co.kr.domain.MusicListDomain;
 import com.co.kr.exception.RequestException;
 import com.co.kr.mapper.UploadMapper;
 import com.co.kr.util.CommonUtils;
 import com.co.kr.vo.FileListVO;
+import com.co.kr.vo.MFileListVO;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -56,6 +60,7 @@ public class UploadServiceImple implements UploadService {
 		// TODO Auto-generated method stub
 		return uploadMapper.boardList();
 	}
+	
 
 	@Override
 	public int fileProcess(FileListVO fileListVO, MultipartHttpServletRequest request, HttpServletRequest httpReq) {
@@ -189,7 +194,164 @@ public class UploadServiceImple implements UploadService {
 		uploadMapper.bdFileRemove(boardFileDomain);
 		
 	}
+
+	//중간과제 추가 *******************************************************
+	@Override
+	public List<MusicListDomain> musicList() {
+		// TODO Auto-generated method stub
+		return uploadMapper.musicList();
+	}
 	
+	@Override
+	public int mfileProcess(MFileListVO mfileListVO, MultipartHttpServletRequest request, HttpServletRequest httpReq) {
+		HttpSession session = httpReq.getSession();
+		
+		MusicContentDomain musicContentDomain = MusicContentDomain.builder()
+				.mbId(session.getAttribute("id").toString())
+				.bdmTitle(mfileListVO.getMtitle())
+				.bdmContent(mfileListVO.getMcontent())
+				.build();
+		
+				if(mfileListVO.getMisEdit() != null) {
+					musicContentDomain.setBdmSeq(Integer.parseInt(mfileListVO.getMseq()));
+					System.out.println("수정업데이트");
+					// db 업데이트
+					uploadMapper.mbdContentUpdate(musicContentDomain);
+				}else {	
+					// db 인서트
+					uploadMapper.mcontentUpload(musicContentDomain);
+					System.out.println(" db 인서트");
+
+				}
+				
+				// file 데이터 db 저장시 쓰일 값 추출
+				int bdmSeq = musicContentDomain.getBdmSeq();
+				String mbId = musicContentDomain.getMbId();
+				
+				//파일객체 담음
+				List<MultipartFile> multipartFiles = request.getFiles("files");
+		
+				// 게시글 수정시 파일관련 물리저장 파일, db 데이터 삭제 
+				if(mfileListVO.getMisEdit() != null) { // 수정시 
+					List<MusicFileDomain> mfileList = null;
+					
+					for (MultipartFile multipartFile : multipartFiles) {
+						
+						if(!multipartFile.isEmpty()) {
+							if(session.getAttribute("files") != null) {	
+								mfileList = (List<MusicFileDomain>) session.getAttribute("files");
+								for (MusicFileDomain list : mfileList) {
+									list.getUpmFilePath();
+									Path filePath = Paths.get(list.getUpmFilePath());
+							 
+							        try {
+							        	// 파일 삭제
+							            Files.deleteIfExists(filePath); // notfound시 exception 발생안하고 false 처리
+							            //삭제 
+										mbdFileRemove(list); //데이터 삭제
+										
+							        }catch (DirectoryNotEmptyException e) {
+							        	throw RequestException.fire(Code.E404, "디렉토리가 존재하지 않습니다", HttpStatus.NOT_FOUND);
+							        	
+							        } catch (IOException e) {
+							        	 e.printStackTrace();
+							        }
+								}
+							}
+						}
+						
+					}
+				}
+				
+				Path rootPath = Paths.get(new File("C://").toString(),"Mupload", File.separator).toAbsolutePath().normalize();			
+				File pathCheck = new File(rootPath.toString());
+				// folder chcek
+				if(!pathCheck.exists()) pathCheck.mkdirs();
 	
+				for (MultipartFile multipartFile : multipartFiles) {
+					if(!multipartFile.isEmpty()) { 
+						//확장자 추출
+						String originalFileExtension;
+						String contentType = multipartFile.getContentType();
+						String origFilename = multipartFile.getOriginalFilename();
+
+						//확장자 존재하지 않을 경우
+						if(ObjectUtils.isEmpty(contentType)){
+							break;
+						}else { // 확장자가 jpeg, png인 파일들만 받아서 처리
+							if(contentType.contains("image/jpeg")) {
+								originalFileExtension = ".jpg";
+							}else if(contentType.contains("image/png")) {
+								originalFileExtension = ".png";
+							}else {
+								break;
+							}
+						}
+						
+						//파일명을 업로드한 날짜로 변환하여 저장
+						String uuid = UUID.randomUUID().toString();
+						String current = CommonUtils.currentTime();
+						String newFileName = uuid + current + originalFileExtension;
+						
+						//최종경로까지 지정
+						Path targetPath = rootPath.resolve(newFileName);
+						
+						File mfile = new File(targetPath.toString());
+						
+						try {
+							//파일복사저장
+							multipartFile.transferTo(mfile);
+							// 파일 권한 설정(쓰기, 읽기)
+							mfile.setWritable(true);
+							mfile.setReadable(true);
+							
+							
+							//파일 domain 생성 
+							MusicFileDomain musicFileDomain = MusicFileDomain.builder()
+									.bdmSeq(bdmSeq)
+									.mbId(mbId)
+									.upOriginalmFileName(origFilename)
+									.upNewmFileName("resources/upload/"+newFileName) // WebConfig에 동적 이미지 폴더 생성 했기때문
+									.upmFilePath(targetPath.toString())
+									.upmFileSize((int)multipartFile.getSize())
+									.build();
+							
+								// db 인서트
+								uploadMapper.mfileUpload(musicFileDomain);
+								System.out.println("upload done");
+							
+						} catch (IOException e) {
+							throw RequestException.fire(Code.E404, "잘못된 업로드 파일", HttpStatus.NOT_FOUND);
+						}
+					}
+
+				}
+		return bdmSeq;
+	}
+
+	@Override
+	public void mbdContentRemove(HashMap<String, Object> map) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mbdFileRemove(MusicFileDomain musicFileDomain) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public MusicListDomain musicSelectOne(HashMap<String, Object> map) {
+		// TODO Auto-generated method stub
+		return uploadMapper.musicSelectOne(map);
+	}
+
+	@Override
+	public List<MusicFileDomain> musicSelectOneFile(HashMap<String, Object> map) {
+		// TODO Auto-generated method stub
+		return uploadMapper.musicSelectOneFile(map);
+	}
+
 
 }
