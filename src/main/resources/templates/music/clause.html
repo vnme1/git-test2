@@ -8,7 +8,7 @@
 </div>
 
 <div class="title" style="color:#00a2be">음악보드 리스트</div>
-<form role="form" action="upload" method="post" enctype="multipart/form-data">
+<form role="form" action="mupload" method="post" enctype="multipart/form-data">
     <div class="section form">
        <table>
         <colgroup>
@@ -27,13 +27,13 @@
             <tr> 
                <th>내용</th>
                 <td >
-                   <textarea colspan="2" id="mstory" name="content" placeholder="한줄평을 적어주세요." rows="5" cols="200" required></textarea>
+                   <textarea colspan="2" id="story" name="mcontent" placeholder="한줄평을 적어주세요." rows="5" cols="200" required></textarea>
                 </td>
             </tr>
             <tr> 
                <th><label for="file">첨부파일</label></th>
                 <td>
-                    <input type="file" id="mfile" name="mfiles" multiple />
+                    <input type="file" id="file" name="files" multiple />
                 </td>
             </tr>
         </tbody>

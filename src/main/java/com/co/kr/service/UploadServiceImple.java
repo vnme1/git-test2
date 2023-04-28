@@ -278,11 +278,11 @@ public class UploadServiceImple implements UploadService {
 						//확장자 존재하지 않을 경우
 						if(ObjectUtils.isEmpty(contentType)){
 							break;
-						}else { // 확장자가 jpeg, png인 파일들만 받아서 처리
-							if(contentType.contains("image/jpeg")) {
-								originalFileExtension = ".jpg";
-							}else if(contentType.contains("image/png")) {
-								originalFileExtension = ".png";
+						}else { // 확장자가 mp3, wav인 파일들만 받아서 처리
+							if(contentType.contains("music/mp3")) {
+								originalFileExtension = ".mp3";
+							}else if(contentType.contains("music/wav")) {
+								originalFileExtension = ".wav";
 							}else {
 								break;
 							}

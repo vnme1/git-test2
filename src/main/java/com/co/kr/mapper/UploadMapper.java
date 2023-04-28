@@ -42,7 +42,6 @@ public interface UploadMapper {
 	public void mcontentUpload(MusicContentDomain musicContentDomain);
 	//file insert
 	public void mfileUpload(MusicFileDomain musicFileDomain);
-
 	//content update
 	public void mbdContentUpdate(MusicContentDomain musicContentDomain);
 	//file updata

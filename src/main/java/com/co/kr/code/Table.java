@@ -8,8 +8,7 @@ public enum Table {
 	MEMBER("member"),
 	FILES("files"),
 	BOARD("board"),
-	MUSIC("music"),
-	FMUSIC("fmusic");
+	MUSIC("music");
 	
 	
 	private String table;
