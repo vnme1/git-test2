@@ -10,8 +10,10 @@ import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.expression.ParseException;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -63,6 +65,15 @@ public class MFileListController {
 		//삭제시 사용할 용도
 		session.setAttribute("files", mfileList);
 
+		return mav;
+	}
+	
+	@GetMapping("mdetail")
+    public ModelAndView bdDetail(@ModelAttribute("mfileListVO") MFileListVO mfileListVO, @RequestParam("bdmSeq") String bdmSeq, HttpServletRequest request) throws IOException {
+		ModelAndView mav = new ModelAndView();
+		//하나파일 가져오기
+		mav = mbdSelectOneCall(mfileListVO, bdmSeq,request);
+		mav.setViewName("music/musicList.html");;
 		return mav;
 	}
 	

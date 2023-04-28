@@ -21,7 +21,7 @@
             <tbody>
               <tr th:each="mitem : ${mitems}">
                   <td th:text="${mitem.bdmSeq}"></td>
-                  <td><a th:text="${mitem.bdmTitle}" th:href="@{/detail(bdmSeq = ${mitem.bdmSeq})}"></a></td>
+                  <td><a th:text="${mitem.bdmTitle}" th:href="@{/mdetail(bdmSeq = ${mitem.bdmSeq})}"></a></td>
                   <td th:text="${mitem.mbId}"></td>
                   <td th:text="${mitem.bdmCreateAt}"></td>
                   <td th:text="${mitem.bdmUpdateAt}"></td>
@@ -30,25 +30,25 @@
         </tbody>
     </table>
     
-    <th:block th:if="${detail}">   
-        <h1 style="padding: 30px 0;" th:text="${detail.bdmTitle}"></h1>
+    <th:block th:if="${mdetail}">   
+        <h1 style="padding: 30px 0;" th:text="${mdetail.bdmTitle}"></h1>
         <div style="text-align: right;">
-            <span style="color: #00a2be;">글번호 </span> <span th:text="${detail.bdmSeq}"></span> <span style="color: #00a2be"> | </span>
-            <span style="color: #00a2be">글쓴이 </span> <span th:text="${detail.mbId}"></span> <span style="color: #00a2be"> | </span> 
-            <span th:text="${detail.bdmCreateAt}"></span> <span style="color: #00a2be"> | </span> 
-            <span th:text="${detail.bdmUpdateAt}"></span> 
+            <span style="color: #00a2be;">글번호 </span> <span th:text="${mdetail.bdmSeq}"></span> <span style="color: #00a2be"> | </span>
+            <span style="color: #00a2be">글쓴이 </span> <span th:text="${mdetail.mbId}"></span> <span style="color: #00a2be"> | </span> 
+            <span th:text="${mdetail.bdmCreateAt}"></span> <span style="color: #00a2be"> | </span> 
+            <span th:text="${mdetail.bdmUpdateAt}"></span> 
         </div>
         
         <div>
-            <p style="padding: 30px 0;" th:text="${detail.bdmContent}"></p>
+            <p style="padding: 30px 0;" th:text="${mdetail.bdmContent}"></p>
             <ul th:if="${mfiles}"  th:each="file : ${mfiles}" style="display: inline-block;margin-bottom: 5px;">
                 <li> <img id="imgId" th:src="@{${file.upNewmFileName}}" alt="첨부이미지" height="280" /></li>
             </ul>
         </div>
 
         <div style="padding: 30px 0; text-align:right;">
-		        <a th:href="@{/edit(bdmSeq = ${detail.bdmSeq})}"><button>수정</button></a>
-            <a th:href="@{/remove(bdmSeq = ${detail.bdmSeq})}"><button>삭제</button></a>
+		        <a th:href="@{/edit(bdmSeq = ${mdetail.bdmSeq})}"><button>수정</button></a>
+            <a th:href="@{/remove(bdmSeq = ${mdetail.bdmSeq})}"><button>삭제</button></a>
             <a th:href="@{bdmList}"><button style="background-color: #00a2be; color: white; margin-left: 20px">목록으로</button></a>
         </div>
         
